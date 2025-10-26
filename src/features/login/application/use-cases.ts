@@ -5,7 +5,7 @@ import type {
   LoginResponse, 
   AuthRepository, 
   LoginError 
-} from '../domain/types';
+} from '../domain/login.domain';
 
 export class LoginUseCase {
   private authRepository: AuthRepository;
@@ -16,7 +16,6 @@ export class LoginUseCase {
 
   async execute(credentials: LoginCredentials): Promise<LoginResponse> {
     try {
-      // Validaciones de negocio
       if (!credentials.email || !credentials.password) {
         throw new Error('Email y contraseña son requeridos');
       }
@@ -29,10 +28,8 @@ export class LoginUseCase {
         throw new Error('La contraseña debe tener al menos 6 caracteres');
       }
 
-      // Ejecutar el login
       const response = await this.authRepository.login(credentials);
       
-      // Guardar token en localStorage
       localStorage.setItem('auth_token', response.token);
       localStorage.setItem('refresh_token', response.refreshToken);
       localStorage.setItem('user_data', JSON.stringify(response.user));
@@ -62,16 +59,13 @@ export class LogoutUseCase {
 
   async execute(): Promise<void> {
     try {
-      // Limpiar datos locales
       localStorage.removeItem('auth_token');
       localStorage.removeItem('refresh_token');
       localStorage.removeItem('user_data');
 
-      // Ejecutar logout en el repositorio
       await this.authRepository.logout();
     } catch (error) {
       console.error('Error durante el logout:', error);
-      // Aún así limpiamos los datos locales
       localStorage.removeItem('auth_token');
       localStorage.removeItem('refresh_token');
       localStorage.removeItem('user_data');
@@ -95,8 +89,7 @@ export class RefreshTokenUseCase {
       }
 
       const response = await this.authRepository.refreshToken(refreshToken);
-      
-      // Actualizar tokens
+
       localStorage.setItem('auth_token', response.token);
       localStorage.setItem('refresh_token', response.refreshToken);
       localStorage.setItem('user_data', JSON.stringify(response.user));
