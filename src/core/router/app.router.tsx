@@ -1,14 +1,30 @@
-import { createBrowserRouter } from "react-router";
-import { LoginPage } from "@/features/login/presentation/pages/LoginPage";
-import { HomePage } from "@/features/home/presentation/pages/HomePage";
+import { lazy } from "react";
+import { createBrowserRouter, Navigate } from "react-router";
+import { ProtectedRoute } from './ProtectedRoute';
+import { PublicRoute } from './PublicRoute';
+
+const HomePage = lazy(() => import('@/features/home/presentation/pages/HomePage'));
+const LoginPage = lazy(() => import('@/features/login/presentation/pages/LoginPage').then(module => ({ default: module.LoginPage })));
 
 export const appRouter = createBrowserRouter([
-  {
+  { 
     path: '/',
-    element: <LoginPage />,
+    element: (
+      <PublicRoute>
+        <LoginPage />
+      </PublicRoute>
+    ),
   },
   {
     path: '/home',
-    element: <HomePage />,
+    element: (
+      <ProtectedRoute>
+        <HomePage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '*',
+    element: <div>404</div>,
   },
 ]);

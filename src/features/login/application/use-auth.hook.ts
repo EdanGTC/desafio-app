@@ -1,29 +1,29 @@
 // Hook personalizado para manejar la autenticación
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { 
   AuthState, 
   LoginCredentials, 
-  LoginResponse, 
   User, 
   LoginError 
-} from '../domain/types';
+} from '../domain/login.domain';
 import { LoginUseCase, LogoutUseCase, RefreshTokenUseCase } from './use-cases';
+import { AuthRepositoryImpl } from '../infrastructure/auth.repository';
 
-export const useAuth = (authRepository: any) => {
+const authRepository = new AuthRepositoryImpl();
+
+export const useAuth = () => {
   const [authState, setAuthState] = useState<AuthState>({
-    isAuthenticated: false,
-    user: null,
+  isAuthenticated: false,
     token: null,
     isLoading: true,
     error: null
   });
 
-  const loginUseCase = new LoginUseCase(authRepository);
-  const logoutUseCase = new LogoutUseCase(authRepository);
-  const refreshTokenUseCase = new RefreshTokenUseCase(authRepository);
+  const loginUseCase = useMemo(() => new LoginUseCase(authRepository), []);
+  const logoutUseCase = useMemo(() => new LogoutUseCase(authRepository), []);
+  const refreshTokenUseCase = useMemo(() => new RefreshTokenUseCase(authRepository), []);
 
-  // Inicializar estado de autenticación
   useEffect(() => {
     const initializeAuth = async () => {
       try {
@@ -31,28 +31,33 @@ export const useAuth = (authRepository: any) => {
         const userData = localStorage.getItem('user_data');
 
         if (token && userData) {
-          const user = JSON.parse(userData);
           const isValid = await authRepository.validateToken(token);
           
           if (isValid) {
             setAuthState({
               isAuthenticated: true,
-              user,
               token,
               isLoading: false,
               error: null
             });
           } else {
-            // Token inválido, intentar renovar
-            await refreshToken();
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('refresh_token');
+            localStorage.removeItem('user_data');
+            setAuthState({
+              isAuthenticated: false,
+              token: null,
+              isLoading: false,
+              error: null
+            });
           }
         } else {
           setAuthState(prev => ({ ...prev, isLoading: false }));
         }
-      } catch (error) {
+        } catch (error) {
+        console.error('Error al inicializar la autenticación:', error);
         setAuthState({
           isAuthenticated: false,
-          user: null,
           token: null,
           isLoading: false,
           error: 'Error al inicializar la autenticación'
@@ -61,7 +66,7 @@ export const useAuth = (authRepository: any) => {
     };
 
     initializeAuth();
-  }, [authRepository]);
+  }, []);
 
   const login = useCallback(async (credentials: LoginCredentials): Promise<void> => {
     setAuthState(prev => ({ ...prev, isLoading: true, error: null }));
@@ -71,7 +76,6 @@ export const useAuth = (authRepository: any) => {
       
       setAuthState({
         isAuthenticated: true,
-        user: response.user,
         token: response.token,
         isLoading: false,
         error: null
@@ -94,15 +98,14 @@ export const useAuth = (authRepository: any) => {
       await logoutUseCase.execute();
       setAuthState({
         isAuthenticated: false,
-        user: null,
         token: null,
         isLoading: false,
         error: null
       });
     } catch (error) {
+      console.error('Error en logout:', error);
       setAuthState({
         isAuthenticated: false,
-        user: null,
         token: null,
         isLoading: false,
         error: null
@@ -115,12 +118,11 @@ export const useAuth = (authRepository: any) => {
       const response = await refreshTokenUseCase.execute();
       setAuthState(prev => ({
         ...prev,
-        user: response.user,
         token: response.token,
         isAuthenticated: true
       }));
     } catch (error) {
-      // Si falla el refresh, hacer logout
+      console.error('Error en refresh token:', error);
       await logout();
     }
   }, [refreshTokenUseCase, logout]);
@@ -138,16 +140,18 @@ export const useAuth = (authRepository: any) => {
   };
 };
 
-// Hook para obtener el usuario actual
-export const useCurrentUser = (authRepository: any) => {
+export const useCurrentUser = () => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
       try {
-        const currentUser = await authRepository.getCurrentUser();
-        setUser(currentUser);
+        const userData = localStorage.getItem('user_data');
+        if (userData) {
+          const currentUser = JSON.parse(userData);
+          setUser(currentUser);
+        }
       } catch (error) {
         console.error('Error al obtener el usuario actual:', error);
         setUser(null);
@@ -157,7 +161,7 @@ export const useCurrentUser = (authRepository: any) => {
     };
 
     fetchCurrentUser();
-  }, [authRepository]);
+  }, []);
 
   return { user, isLoading };
 };
