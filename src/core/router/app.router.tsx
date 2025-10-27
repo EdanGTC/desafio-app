@@ -2,6 +2,7 @@ import { lazy } from "react";
 import { createBrowserRouter } from "react-router";
 import { ProtectedRoute } from './ProtectedRoute';
 import { PublicRoute } from './PublicRoute';
+import { RouterErrorPage } from "./RouterErrorPage";
 
 const HomePage = lazy(() => import('@/features/home/presentation/pages/HomePage'));
 const LoginPage = lazy(() => import('@/features/login/presentation/pages/LoginPage'));
@@ -14,6 +15,7 @@ export const appRouter = createBrowserRouter([
         <LoginPage />
       </PublicRoute>
     ),
+    errorElement: <RouterErrorPage />, 
   },
   {
     path: '/home',
@@ -22,9 +24,11 @@ export const appRouter = createBrowserRouter([
         <HomePage />
       </ProtectedRoute>
     ),
+    errorElement: <RouterErrorPage />,
   },
   {
     path: '*',
     element: <div>404</div>,
+    errorElement: <RouterErrorPage />,
   },
 ]);
