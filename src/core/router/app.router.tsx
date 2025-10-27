@@ -1,10 +1,10 @@
 import { lazy } from "react";
-import { createBrowserRouter, Navigate } from "react-router";
+import { createBrowserRouter } from "react-router";
 import { ProtectedRoute } from './ProtectedRoute';
 import { PublicRoute } from './PublicRoute';
 
 const HomePage = lazy(() => import('@/features/home/presentation/pages/HomePage'));
-const LoginPage = lazy(() => import('@/features/login/presentation/pages/LoginPage').then(module => ({ default: module.LoginPage })));
+const LoginPage = lazy(() => import('@/features/login/presentation/pages/LoginPage'));
 
 export const appRouter = createBrowserRouter([
   { 
@@ -18,7 +18,7 @@ export const appRouter = createBrowserRouter([
   {
     path: '/home',
     element: (
-      <ProtectedRoute>
+      <ProtectedRoute>  
         <HomePage />
       </ProtectedRoute>
     ),

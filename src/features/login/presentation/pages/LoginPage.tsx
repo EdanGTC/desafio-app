@@ -1,6 +1,6 @@
 import { LoginForm } from '../components/LoginForm'
 
-export const LoginPage = () => {
+const LoginPage = () => {
   return (
     <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
       
@@ -17,3 +17,5 @@ export const LoginPage = () => {
   </div>
   )
 }
+
+export default LoginPage

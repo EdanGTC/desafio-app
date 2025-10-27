@@ -42,3 +42,8 @@ src/
 ├── ui/             # Componentes UI reutilizables
 └── core/           # Configuración de router
 ```
+## Mejoras a futuro
+
+Actualmente, el login implementado es simulado y no está conectado a un backend real, por lo que el token se almacena en localStorage solo con fines de demostración. A futuro, se recomienda implementar un sistema de autenticación seguro en el servidor que utilice cookies con atributos httpOnly, secure y sameSite para proteger mejor la información y evitar vulnerabilidades de seguridad.
+
+Se recomienda implementar una estrategia de testing completa que incluya pruebas unitarias, de integración y e2e para garantizar la calidad del código y la estabilidad de los flujos principales. Se sugiere configurar herramientas como Jest y React Testing Library
