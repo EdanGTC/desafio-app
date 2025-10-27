@@ -1,12 +1,14 @@
 import { useAuth } from '@/features/login/application/use-auth.hook'
 import { useInfiniteQuery} from '@tanstack/react-query'
-import axios from 'axios'
 import { useNavigate } from 'react-router'
 import { API_CONFIG, MAX_PAGES, APP_CONFIG } from '@/shared/constants'
+import { useRickMortyApi } from './hooks/use-rick-morty-api.hook'
+import { useMemo } from 'react'
 
 export const useHomePage = () => {
   const { logout } = useAuth()
   const navigate = useNavigate()
+  const { getCharacters } = useRickMortyApi()
 
   const handleLogout = async () => {
     try {
@@ -17,11 +19,6 @@ export const useHomePage = () => {
     }
   }
 
-  const getHomeData = async (page: number = 1) => {
-    const response = await axios.get(`${API_CONFIG.BASE_URL}${API_CONFIG.CHARACTERS_ENDPOINT}?page=${page}`)
-    return response.data
-  }
-
   const { 
     data, 
     fetchNextPage, 
@@ -30,7 +27,7 @@ export const useHomePage = () => {
     isLoading 
   } = useInfiniteQuery({
     queryKey: ['home-data'],
-    queryFn: ({ pageParam = 1 }) => getHomeData(pageParam),
+    queryFn: ({ pageParam = 1 }) => getCharacters(pageParam),
     enabled: !!localStorage.getItem('auth_token'),
     staleTime: APP_CONFIG.STALE_TIME,
     refetchOnWindowFocus: APP_CONFIG.REFETCH_ON_WINDOW_FOCUS,
@@ -52,9 +49,11 @@ export const useHomePage = () => {
     initialPageParam: 1,
   })
 
+  const characters = useMemo(() => data?.pages.flatMap((page) => page.results) || [], [data])
+
   return {
     state: {
-      data: data?.pages.flatMap((page) => page.results) || [],
+      data: characters,
       isLoading,
       isFetchingNextPage,
       hasNextPage: !!hasNextPage,

@@ -11,6 +11,5 @@ export const handleRequestOnSuccess: GenericHttpRequestOnSuccessHandler = async 
 };
 
 export const handleRequestOnRejected: GenericHttpRequestOnRejectHandler = async (error) => {
-  console.error('Request interceptor error:', error);
   return Promise.reject(error);
 };

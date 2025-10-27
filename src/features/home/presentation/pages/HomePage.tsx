@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button'
+import { Button } from '@/ui/components/button'
 import { useHomePage } from '../../application/useHomePage'
 import { CharacterCard, CharacterCardProps } from '@/ui/components/CharacterCard/CharacterCard'
 import { useInfiniteScroll } from '@/shared/hooks'
@@ -14,10 +14,6 @@ const HomePage = () => {
     isFetchingNextPage,
     fetchNextPage,
   })
-
-  const handleLoadMore = () => {
-    fetchNextPage()
-  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -59,18 +55,6 @@ const HomePage = () => {
             {isFetchingNextPage && (
               <div className="text-center py-4">
                 <div className="text-gray-600">Cargando más personajes...</div>
-              </div>
-            )}
-            
-            {hasNextPage && !isFetchingNextPage && (
-              <div className="text-center py-4">
-                <Button 
-                  onClick={handleLoadMore}
-                  variant="outline"
-                  className="bg-green-700 hover:bg-green-800 text-white border-green-700"
-                >
-                  Cargar más personajes
-                </Button>
               </div>
             )}
             

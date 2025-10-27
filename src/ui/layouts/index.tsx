@@ -1,4 +1,3 @@
-// Layouts reutilizables
 import React from 'react';
 
 interface LayoutProps {
