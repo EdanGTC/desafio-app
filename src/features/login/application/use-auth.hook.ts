@@ -1,5 +1,3 @@
-// Hook personalizado para manejar la autenticación
-
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { 
   AuthState, 
