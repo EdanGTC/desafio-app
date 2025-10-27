@@ -1,8 +1,8 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { Button } from "@/ui/components/button"
+import { Input } from "@/ui/components/input"
+import { Label } from "@/ui/components/label"
 import { 
   Card, 
   CardContent,
@@ -10,7 +10,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle
-} from "@/components/ui/card"
+} from "@/ui/components/card"
 import { useLoginForm } from "../../application/useLoginForm"
 
 export const LoginForm = () => {

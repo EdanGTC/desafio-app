@@ -30,7 +30,6 @@ export class AuthRepositoryImpl implements AuthRepository {
     localStorage.setItem('refresh_token', fakeResponse.refreshToken);
     localStorage.setItem('user_data', JSON.stringify(fakeResponse.user));
 
-    console.info('Fake login exitoso:', fakeResponse);
     return fakeResponse;
   }
 
@@ -45,7 +44,6 @@ export class AuthRepositoryImpl implements AuthRepository {
     localStorage.removeItem('refresh_token');
     localStorage.removeItem('user_data');
 
-    console.info('Logout exitoso');
   }
 
   async validateToken(token: string): Promise<boolean> {
@@ -58,13 +56,11 @@ export class AuthRepositoryImpl implements AuthRepository {
     // Validar que el token existe y tiene el formato correcto
     const isValid = !!token && token.startsWith('fake-token-');
     
-    console.log(`Validación de token: ${isValid ? 'Válido' : 'Inválido'}`);
     return isValid;
   }
 
   async refreshToken(_refreshToken: string): Promise<LoginResponse> {
     // El parámetro _refreshToken se usa para la interfaz, pero en el fake no lo necesitamos
-    console.log('Refrescando token...', _refreshToken);
     // Simular refresh usando el singleton HTTP
     // const client = this.httpClient.getClient('https://jsonplaceholder.typicode.com');
     
@@ -82,12 +78,10 @@ export class AuthRepositoryImpl implements AuthRepository {
       }
     };
 
-    // Actualizar tokens (el interceptor usará el nuevo token automáticamente)
     localStorage.setItem('auth_token', newResponse.token);
     localStorage.setItem('refresh_token', newResponse.refreshToken);
     localStorage.setItem('user_data', JSON.stringify(newResponse.user));
 
-    console.log('Token renovado exitosamente');
     return newResponse;
   }
 }

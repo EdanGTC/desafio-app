@@ -1,4 +1,4 @@
-import { Card } from "@/components/ui/card"
+import { Card } from "@/ui/components/card"
 
 export type CharacterCardProps = {
   id: number
