@@ -1,35 +1,40 @@
-import React, { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useAuth } from './use-auth.hook'
 import { useNavigate } from 'react-router'
+import { loginSchema, type LoginFormData } from '../domain/login.schemas'
+import { useCallback } from 'react'
 
 export const useLoginForm = () => {
-    const [email, setEmail] = useState("")
-    const [password, setPassword] = useState("")
-    const { login, isLoading, error } = useAuth()
-    const navigate = useNavigate()
+  const { login, isLoading, error } = useAuth()
+  const navigate = useNavigate()
   
-    const handleSubmit = async (e: React.FormEvent) => {
-      e.preventDefault()
-      
-      try {
-        await login({ email, password })
-        navigate('/home')
-      } catch (error) {
-        console.error('Error en login:', error)
-      }
-    }
+  const {
+    register,
+    handleSubmit: handleFormSubmit,
+    formState: { errors },
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+  })
 
-    return {
-        state: {
-            email,
-            password,
-            isLoading,
-            error,
-        },
-        handlers: {
-            setEmail,
-            setPassword,
-            handleSubmit,
-        },
+  const onSubmit = useCallback(async (data: LoginFormData) => {
+    try {
+      await login(data)
+      navigate('/home')
+    } catch (error) {
+      console.error('Error en login:', error)
     }
+  }, [login, navigate])
+
+  return {
+    handlers: {
+      register,
+      onSubmit: handleFormSubmit(onSubmit),
+    },
+    state: {
+      isLoading,
+      error,
+      errors,
+    },
+  }
 }
